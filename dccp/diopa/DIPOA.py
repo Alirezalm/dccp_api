@@ -53,5 +53,7 @@ def dipoa(problem_instance, comm, mpi_class):
             data_memory['iter'].append(k)
             print(f"lb: {lower_bound}, ub:{upper_bound}")
     data_memory['x'] = [item[0] for item in x]
+    data_memory['obj'] = lower_bound
+    data_memory['gap'] = (upper_bound - lower_bound) / upper_bound
 
     return data_memory
