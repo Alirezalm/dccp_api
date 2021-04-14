@@ -1,12 +1,14 @@
 import json
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 import os, sys
 
 app = Flask(__name__)
 
-PATH = os.path.join(os.path.dirname(__file__))
-sys.path.append(PATH)
+PATH = os.path.join(os.path.dirname(__file__), '.env')
+
+load_dotenv(PATH)
 
 
 @app.route('/', methods = ['POST'])
