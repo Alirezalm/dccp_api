@@ -15,6 +15,8 @@ def dipoa(problem_instance, comm, mpi_class):
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
 
+    # TODO: SFP IMPLEMENTATION
+
     cut_manager = CutStoreGen()
 
     rcv_x = None  # related to MPI gather
@@ -22,7 +24,7 @@ def dipoa(problem_instance, comm, mpi_class):
 
     upper_bound = 1e8
     lower_bound = -upper_bound
-    eps = 0.05
+    eps = 0.005
     data_memory = {
         'x': None,
         'lb': [],

@@ -9,17 +9,13 @@ from dccp.problem.problem import Problem
 with open('config.json') as jsonfile:
     my_data = json.load(jsonfile)
 
-print(my_data)
-
 
 def run(data):
     comm = MPI.COMM_WORLD
 
     rank = comm.Get_rank()
 
-    print(data, f"from node {rank}")
-
-    problem = Problem(problem_data = data).create_random_problem_instance(0.9)
+    problem = Problem(problem_data = data).create_random_problem_instance(10)
     solution_data = problem.solve(comm, MPI)
 
     if rank == 0:
