@@ -1,3 +1,5 @@
+from time import time
+
 from numpy import zeros
 from numpy.random import randn, rand
 
@@ -34,7 +36,8 @@ class Problem(object):
             return self
 
     def solve(self, comm, mpi_class):  # starts dipoa algorithm
-
+        start_time = time()
         solution_data = dipoa(self, comm, mpi_class)
-
+        elapsed_time = time() - start_time
+        solution_data['elapsed_time'] = elapsed_time
         return solution_data

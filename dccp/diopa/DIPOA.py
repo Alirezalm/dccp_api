@@ -11,7 +11,7 @@ from dccp.rhadmm.rhadmm import rhadmm
 def dipoa(problem_instance, comm, mpi_class):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    max_iter = 20
+    max_iter = 100
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
 
@@ -22,6 +22,7 @@ def dipoa(problem_instance, comm, mpi_class):
 
     upper_bound = 1e8
     lower_bound = -upper_bound
+    eps = 0.05
     data_memory = {
         'x': None,
         'lb': [],
@@ -29,6 +30,7 @@ def dipoa(problem_instance, comm, mpi_class):
         'iter': []
     }
     x = zeros((n, 1))
+
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
@@ -51,7 +53,13 @@ def dipoa(problem_instance, comm, mpi_class):
             data_memory['ub'].append(upper_bound)
             data_memory['lb'].append(lower_bound)
             data_memory['iter'].append(k)
-            print(f"lb: {lower_bound}, ub:{upper_bound}")
+
+        rel_gap = comm.bcast((upper_bound - lower_bound) / upper_bound, root = 0)
+        if rank == 0:
+            print(f"lb: {lower_bound}, ub:{upper_bound} gap: {rel_gap}")
+        if rel_gap <= eps:
+            break
+
     data_memory['x'] = [item[0] for item in x]
     data_memory['obj'] = lower_bound
     data_memory['gap'] = (upper_bound - lower_bound) / upper_bound
