@@ -1,1 +1,1 @@
-{"name": "distributed sparse logistic regression", "nVars": 10, "nSamples": 100, "nZeros": 5, "nNodes": 4, "compareTo": "shot", "sfp": true}
+{"name": "distributed sparse logistic regression", "nVars": 10, "nSamples": 100, "nZeros": 5, "nNodes": 4, "compareTo": "shot", "sfp": 1}

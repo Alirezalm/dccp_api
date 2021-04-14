@@ -16,9 +16,8 @@ def dipoa(problem_instance, comm, mpi_class):
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
     if problem_instance.sfp:
-        x = sfp(problem_instance, rank, comm, mpi_class)
+        binvar = sfp(problem_instance, rank, comm, mpi_class)
     cut_manager = CutStoreGen()
-
     rcv_x = None  # related to MPI gather
     rcv_gx = None
 

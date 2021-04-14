@@ -2,6 +2,7 @@ from time import time
 
 from numpy import zeros
 from numpy.random import randn, rand
+from sklearn import preprocessing
 
 from dccp.diopa.DIPOA import dipoa
 from dccp.problem.problem_classes import LogRegProb
@@ -28,7 +29,7 @@ class Problem(object):
     # should be run before solve
     def create_random_problem_instance(self, bound):
         if self.name == PROBLEM_CLASS['dslr']:
-            dataset = randn(self.nSamples, self.nVars)
+            dataset = preprocessing.normalize(randn(self.nSamples, self.nVars), norm = 'l2')
             response = randn(self.nSamples, 1)
             response[response >= 0.5] = 1
             response[response < 0.5] = 0

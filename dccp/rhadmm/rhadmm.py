@@ -23,7 +23,7 @@ def create_prime_grad(main_grad, z, y, rho):
 
 
 def rhadmm(problem, bin_var, comm, mpi_class):
-    rho = 70
+    rho = 0.5
     max_iter = 500
     n = problem.nVars
     y = zeros((n, 1))
@@ -57,10 +57,14 @@ def rhadmm(problem, bin_var, comm, mpi_class):
         s = rho ** 2 * problem.nNodes * norm(z_old - z)
         t = comm.reduce(r, op = mpi_class.SUM, root = 0)
         t = comm.bcast(t, root = 0)
+
         # if rank == 0:
         #     print(f" k:{k} t: {t} s: {s} rank: {rank}")
+
         if (t <= eps) & (s <= eps / 2):
-            # print(f'done: {rank}')
+
+            if rank == 0:
+                print(f"RHADMM ITERATION MAX: {k}")
             return z, problem.problem_instance.compute_obj_at(z)[0][0], problem.problem_instance.compute_grad_at(z)
 
-    return z,
+    return z, problem.problem_instance.compute_obj_at(z)[0][0], problem.problem_instance.compute_grad_at(z)
