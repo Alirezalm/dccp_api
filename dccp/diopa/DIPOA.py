@@ -4,6 +4,7 @@ Main loop of the DIPOA Algorithm
 from numpy import zeros, ones
 
 from dccp.diopa.cut_store_gen import CutStoreGen
+from dccp.diopa.heuristics import sfp
 from dccp.masters.master_problem import solve_master
 from dccp.rhadmm.rhadmm import rhadmm
 
@@ -14,9 +15,8 @@ def dipoa(problem_instance, comm, mpi_class):
     max_iter = 100
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
-
-    # TODO: SFP IMPLEMENTATION
-
+    if problem_instance.sfp:
+        x = sfp(problem_instance, rank, comm, mpi_class)
     cut_manager = CutStoreGen()
 
     rcv_x = None  # related to MPI gather
@@ -32,7 +32,7 @@ def dipoa(problem_instance, comm, mpi_class):
         'iter': []
     }
     x = zeros((n, 1))
-
+    problem_instance.sfp = False
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
