@@ -3,7 +3,7 @@ from time import time
 from numpy import zeros
 from numpy.random import randn, rand
 from sklearn import preprocessing
-
+from numpy.random import seed
 from dccp.diopa.DIPOA import dipoa
 from dccp.problem.problem_classes import LogRegProb
 from dccp.rhadmm.rhadmm import rhadmm
@@ -16,6 +16,7 @@ PROBLEM_CLASS = {
 
 class Problem(object):
     def __init__(self, problem_data: dict):
+
         self.name = problem_data['name']
         self.nVars = int(problem_data['nVars'])
         self.nSamples = int(problem_data['nSamples'])
@@ -28,6 +29,7 @@ class Problem(object):
 
     # should be run before solve
     def create_random_problem_instance(self, bound):
+        seed(0)
         if self.name == PROBLEM_CLASS['dslr']:
             dataset = preprocessing.normalize(randn(self.nSamples, self.nVars), norm = 'l2')
             response = randn(self.nSamples, 1)

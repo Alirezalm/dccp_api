@@ -23,11 +23,12 @@ def create_prime_grad(main_grad, z, y, rho):
 
 
 def rhadmm(problem, bin_var, comm, mpi_class):
-    rho = 0.5
+    rho = 1
     max_iter = 500
     n = problem.nVars
     y = zeros((n, 1))
     z = zeros((n, 1))
+    x = zeros((n, 1))
     z_old = zeros((n, 1))
     eps = 1e-3
     sum_reduce = zeros((n, 1))  # size must match the reduce op -- used for MPI reduction
@@ -36,7 +37,7 @@ def rhadmm(problem, bin_var, comm, mpi_class):
         obj_func_inner = create_prime_obj(problem.problem_instance.compute_obj_at, z, y, rho)
         grad_func_inner = create_prime_grad(problem.problem_instance.compute_grad_at, z, y, rho)
         x = update_primary_vars(obj_func_inner, grad_func_inner, n, problem.sfp, problem.nZeros,
-                                problem.bound)  # compute x update locally by each node
+                                problem.bound, x)  # compute x update locally by each node
 
         sum_local = x + 1 / rho * y
         # reduction
@@ -44,8 +45,8 @@ def rhadmm(problem, bin_var, comm, mpi_class):
         if rank == 0:
             z_old = z
             z = 1 / problem.nNodes * sum_reduce
-            if not problem.sfp:
-                z = minimum(problem.bound * bin_var, maximum(-problem.bound * bin_var, z))
+            # if not problem.sfp:
+            z = minimum(problem.bound * bin_var, maximum(-problem.bound * bin_var, z))
 
         comm.Bcast(z_old, root = 0)
         comm.Bcast(z, root = 0)  # broadcasting the z step .. all nodes have updates z
@@ -66,5 +67,6 @@ def rhadmm(problem, bin_var, comm, mpi_class):
             if rank == 0:
                 print(f"RHADMM ITERATION MAX: {k}")
             return z, problem.problem_instance.compute_obj_at(z)[0][0], problem.problem_instance.compute_grad_at(z)
-
+    if rank == 0:
+        print(f"RHADMM DID NOT CONVERGE: r: {r} s: {s}")
     return z, problem.problem_instance.compute_obj_at(z)[0][0], problem.problem_instance.compute_grad_at(z)
