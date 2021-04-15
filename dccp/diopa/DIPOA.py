@@ -2,6 +2,7 @@
 Main loop of the DIPOA Algorithm
 """
 from numpy import zeros, ones
+from numpy.linalg import eig
 
 from dccp.diopa.cut_store_gen import CutStoreGen
 from dccp.diopa.heuristics import sfp
@@ -20,7 +21,7 @@ def dipoa(problem_instance, comm, mpi_class):
     cut_manager = CutStoreGen()
     rcv_x = None  # related to MPI gather
     rcv_gx = None
-
+    rcv_eig = None
     upper_bound = 1e8
     lower_bound = -upper_bound
     eps = 0.005
@@ -35,6 +36,9 @@ def dipoa(problem_instance, comm, mpi_class):
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
+        # if problem_instance.soc:
+        min_eig = min(eig(problem_instance.problem_instance.compute_hess_at(x))[0])
+
         ub = comm.reduce(fx, op = mpi_class.SUM, root = 0)
         if rank == 0:
             upper_bound = min(ub, upper_bound)
@@ -42,13 +46,14 @@ def dipoa(problem_instance, comm, mpi_class):
             rcv_gx = zeros((size, n))
 
         rcv_fx = comm.gather(fx, root = 0)
+        rcv_eig = comm.gather(min_eig, root = 0)
         comm.Gather([x, mpi_class.DOUBLE], rcv_x, root = 0)
         comm.Gather([gx, mpi_class.DOUBLE], rcv_gx, root = 0)
 
         if rank == 0:
             for node in range(size):
                 cut_manager.store_cut(k, node, rcv_x[node, :].reshape(n, 1), rcv_fx[node],
-                                      rcv_gx[node, :].reshape(n, 1))
+                                      rcv_gx[node, :].reshape(n, 1), rcv_eig[node])
 
             lower_bound, binvar = solve_master(problem_instance, cut_manager)
             data_memory['ub'].append(upper_bound)

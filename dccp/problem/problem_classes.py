@@ -1,8 +1,6 @@
 from numpy import exp, log, diagflat
 
 
-
-
 class LogRegProb(object):
 
     def __init__(self, local_dataset, local_response):
