@@ -3,7 +3,7 @@ class CutStoreGen(object):
     def __init__(self):
         self.cut_storage = []
 
-    def store_cut(self, cut_num, node_num, local_sol, local_obj, local_grad, local_eig):
+    def store_cut(self, cut_num, node_num, local_sol, local_obj, local_grad, local_eig = 0):
         cut_info = {
             'cut_id': cut_num,
             'node_id': node_num,

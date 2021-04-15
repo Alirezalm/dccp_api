@@ -22,7 +22,8 @@ class Problem(object):
         self.nZeros = int(problem_data['nZeros'])
         self.compareTo = problem_data['compareTo']
         self.nNodes = int(problem_data['nNodes'])
-        self.sfp = problem_data['sfp']
+        self.sfp = bool(problem_data['sfp'])
+        self.soc = bool(problem_data['soc'])
         self.problem_instance = None
         self.bound = None
 
