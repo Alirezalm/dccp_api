@@ -1,7 +1,7 @@
 """
 Main loop of the DIPOA Algorithm
 """
-from numpy import zeros, ones
+from numpy import zeros
 from numpy.linalg import eig
 
 from dccp.diopa.cut_store_gen import CutStoreGen
@@ -24,7 +24,7 @@ def dipoa(problem_instance, comm, mpi_class):
     rcv_eig = None
     upper_bound = 1e8
     lower_bound = -upper_bound
-    eps = 0.005
+    eps = 0.05  # 5%
     data_memory = {
         'x': None,
         'lb': [],
@@ -32,6 +32,7 @@ def dipoa(problem_instance, comm, mpi_class):
         'iter': []
     }
     x = zeros((n, 1))
+    min_eig = 0
     problem_instance.sfp = False
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
@@ -40,6 +41,7 @@ def dipoa(problem_instance, comm, mpi_class):
             min_eig = min(eig(problem_instance.problem_instance.compute_hess_at(x))[0])
 
         ub = comm.reduce(fx, op = mpi_class.SUM, root = 0)
+
         if rank == 0:
             upper_bound = min(ub, upper_bound)
             rcv_x = zeros((size, n))
