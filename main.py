@@ -11,7 +11,7 @@ ENV_PATH = os.path.join(PATH, '.env')
 load_dotenv(ENV_PATH)
 
 
-@app.route('/', methods = ['POST'])
+@app.route('/', methods = ['POST', 'GET'])
 def main_page():
     mpi_run = None
     if request.method == 'POST':
@@ -22,12 +22,14 @@ def main_page():
         mpi_run = os.system(f"mpiexec -n {problem_data['nNodes']} {sys.executable} {PATH}/run.py")
         # import run
         # run.run(problem_data)
-    if mpi_run == 0:
-        with open('solution.json') as jsonfile:
-            my_data = json.load(jsonfile)
-        return jsonify(my_data)
+        if mpi_run == 0:
+            with open('solution.json') as jsonfile:
+                my_data = json.load(jsonfile)
+            return jsonify(my_data)
+        else:
+            return jsonify({'status': 'failed'})
     else:
-        return jsonify({'status': 'failed'})
+        return jsonify({'status': 'GET REQUEST NOT ALLOWED'})
 
 
 if __name__ == '__main__':

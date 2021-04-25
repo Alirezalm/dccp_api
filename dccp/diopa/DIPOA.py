@@ -2,7 +2,8 @@
 Main loop of the DIPOA Algorithm
 """
 from numpy import zeros
-from numpy.linalg import eig
+from numpy.linalg import eig, norm
+from numpy.ma import ones
 
 from dccp.diopa.cut_store_gen import CutStoreGen
 from dccp.diopa.heuristics import sfp
@@ -13,7 +14,7 @@ from dccp.rhadmm.rhadmm import rhadmm
 def dipoa(problem_instance, comm, mpi_class):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    max_iter = 100
+    max_iter = 300
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
     if problem_instance.sfp:
@@ -37,6 +38,7 @@ def dipoa(problem_instance, comm, mpi_class):
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
+        # print(norm(x))
         if problem_instance.soc:
             min_eig = min(eig(problem_instance.problem_instance.compute_hess_at(x))[0])
 
@@ -44,6 +46,7 @@ def dipoa(problem_instance, comm, mpi_class):
 
         if rank == 0:
             upper_bound = min(ub, upper_bound)
+            # upper_bound = ub
             rcv_x = zeros((size, n))
             rcv_gx = zeros((size, n))
 
@@ -67,14 +70,14 @@ def dipoa(problem_instance, comm, mpi_class):
             data_memory['lb'].append(lower_bound)
             data_memory['iter'].append(k)
 
-        rel_gap = comm.bcast((upper_bound - lower_bound) / upper_bound, root = 0)
+        rel_gap = comm.bcast((upper_bound - lower_bound) / abs(upper_bound + 1e-8), root = 0)
         if rank == 0:
-            print(f"lb: {lower_bound}, ub:{upper_bound} gap: {rel_gap}")
+            print(f"k: {k} lb: {lower_bound}, ub:{upper_bound} gap: {rel_gap}")
         if rel_gap <= eps:
             break
 
     data_memory['x'] = [item[0] for item in x]
     data_memory['obj'] = lower_bound
-    data_memory['gap'] = (upper_bound - lower_bound) / upper_bound
+    data_memory['gap'] = (upper_bound - lower_bound) / abs(upper_bound + 1e-8)
 
     return data_memory

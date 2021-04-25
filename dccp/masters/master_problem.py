@@ -13,8 +13,8 @@ def solve_master(problem_instance, cut_manager):
     total_cuts = len(cut_manager.cut_storage)
 
     # defining variables
-    alpha = model.addMVar(shape = N)
-    x = model.addMVar(shape = n)
+    alpha = model.addMVar(shape = N, lb = -GRB.INFINITY)
+    x = model.addMVar(shape = n, lb = -GRB.INFINITY)
     delta = model.addMVar(shape = n, vtype = GRB.BINARY)
 
     obj = ones((problem_instance.nNodes, 1)).T @ alpha
@@ -23,10 +23,12 @@ def solve_master(problem_instance, cut_manager):
     # introducing linear cuts
     i = 0
     for cut in cut_manager.cut_storage:
+
         if i == N - 1:
             i = 0
         else:
             i += 1
+
         if problem_instance.soc:
             model.addConstr(alpha[i] >= cut['fx'] + cut['gx'].T @ x - cut['gx'].T @ cut['x'] + cut['eig'] / 2 * (
                         x @ x - 2 * cut['x'].T @ x + cut['x'].T @ cut['x']), name = f"cut['cut_id']")
@@ -39,6 +41,7 @@ def solve_master(problem_instance, cut_manager):
 
     model.addConstr(delta.sum() <= kappa, name = 'd')
     model.setParam('OutputFlag', 0)
+    model.setParam('MIPGap', 1e-5)
     model.optimize()
-
+    # model.printStats()
     return model.objval, delta.x.reshape(n, 1),

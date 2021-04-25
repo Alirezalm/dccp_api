@@ -1,16 +1,17 @@
 from time import time
 
-from numpy import zeros
+from numpy import zeros, eye
+from numpy.linalg import eig
 from numpy.random import randn, rand
 from sklearn import preprocessing
 from numpy.random import seed
 from dccp.diopa.DIPOA import dipoa
-from dccp.problem.problem_classes import LogRegProb
+from dccp.problem.problem_classes import LogRegProb, QuadConsProb
 from dccp.rhadmm.rhadmm import rhadmm
 
 PROBLEM_CLASS = {
-    'dslr': 'distributed sparse logistic regression',
-    'dspo': 'distributed sparse portfolio optimization',
+    'distributedSparseLogisticRegression': 'dslr',
+    'distributedSparseQCQP': 'dsqcqp'
 }
 
 
@@ -18,7 +19,8 @@ class Problem(object):
     def __init__(self, problem_data: dict):
         self.name = problem_data['name']
         self.nVars = int(problem_data['nVars'])
-        self.nSamples = int(problem_data['nSamples'])
+        if self.name == "dslr":
+            self.nSamples = int(problem_data['nSamples'])
         self.nZeros = int(problem_data['nZeros'])
         self.compareTo = problem_data['compareTo']
         self.nNodes = int(problem_data['nNodes'])
@@ -29,8 +31,8 @@ class Problem(object):
 
     # should be run before solve
     def create_random_problem_instance(self, bound):
-        seed(0)  # just for test
-        if self.name == PROBLEM_CLASS['dslr']:
+        # seed(0)  # just for test/
+        if self.name == PROBLEM_CLASS['distributedSparseLogisticRegression']:
             dataset = preprocessing.normalize(randn(self.nSamples, self.nVars), norm = 'l2')
             response = randn(self.nSamples, 1)
             response[response >= 0.5] = 1
@@ -38,6 +40,19 @@ class Problem(object):
             self.problem_instance = LogRegProb(local_dataset = dataset, local_response = response)
             self.bound = bound
             return self
+        elif self.name == PROBLEM_CLASS['distributedSparseQCQP']:
+            mat = preprocessing.normalize(randn(self.nVars, self.nVars), norm = 'l2')
+            mat = 0.5 * (mat.T + mat)
+            diag_mat = (1 + rand()) * eye(self.nVars)
+            obj_hess = mat.T @ mat + diag_mat
+
+            obj_vec = rand(self.nVars, 1)
+            problem_data = {'obj_hess': obj_hess, 'obj_vec': obj_vec, 'obj_const': randn()}
+            self.problem_instance = QuadConsProb(problem_data = problem_data)
+            self.bound = bound
+            return self
+        else:
+            raise ValueError(f'problem class {self.name} is not supported yet')
 
     def solve(self, comm, mpi_class):  # starts dipoa algorithm
         start_time = time()
