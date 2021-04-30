@@ -19,9 +19,9 @@ def main_page():
         with open('config.json', 'w') as jsonfile:
             json.dump(problem_data, jsonfile)
 
-        # mpi_run = os.system(f"mpiexec -n {problem_data['nNodes']} {sys.executable} {PATH}/run.py")
-        import run
-        run.run(problem_data)
+        mpi_run = os.system(f"mpiexec -n {problem_data['nNodes']} {sys.executable} {PATH}/run.py")
+        # import run
+        # run.run(problem_data)
         if mpi_run == 0:
             with open('solution.json') as jsonfile:
                 my_data = json.load(jsonfile)

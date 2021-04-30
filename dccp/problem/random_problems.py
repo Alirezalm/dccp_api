@@ -1,5 +1,5 @@
 from numpy import eye
-from numpy.random import randn, rand
+from numpy.random import randn, rand, seed
 from sklearn import preprocessing
 
 
@@ -18,6 +18,7 @@ def gen_qcqp(nvars, num_quad_consts):
     }
 
     for i in range(num_quad_consts + 1):
+        # seed(0)
         _hess = preprocessing.normalize(randn(nvars, nvars), norm = 'l2')
         _hess = 0.5 * (_hess.T + _hess)
         diag_mat = (1 + rand()) * eye(nvars)
@@ -27,11 +28,11 @@ def gen_qcqp(nvars, num_quad_consts):
             problem_data['obj']['hessian_mat'] = hess
             problem_data['obj']['grad_vec'] = grad
         else:
-
+            hess = eye(nvars)  # just for test
             constr = {
                 'hessian_mat': hess,
                 'grad_vec': grad,
-                'const': randn()
+                'const': -rand()
             }
             problem_data['constr'].append(constr)
     return problem_data

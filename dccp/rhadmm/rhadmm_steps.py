@@ -6,8 +6,9 @@ from scipy.optimize import minimize, NonlinearConstraint
 
 def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
     initial_condition = zeros((n_vars,))
-    method = 'CG'
+    method = 'TNC'
     quad_constr = []
+    options = {}
     if constrs is not None:
         method = 'trust-constr'
         quad_constr = []
@@ -16,9 +17,19 @@ def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
                 lambda x: x.T @ constr['hessian_mat'] @ x + constr['grad_vec'].T @ x + constr['const'],
                 -inf, 0
             ))
+        options = {
+            'disp': False
+        }
 
-    solver = minimize(rhadmm_obj, jac = rhadmm_grad, x0 = initial_condition, method = method, options = {},
+        slack_solver = minimize(quad_constr[0].fun, x0 = randn(n_vars,))
+        if slack_solver.success & (slack_solver.fun <= 0):
+            initial_condition = slack_solver.x
+        else:
+            raise ValueError("INNER PROBLEM FAILED: PROBLEM INFEASIBLE")
+
+    solver = minimize(rhadmm_obj, jac = rhadmm_grad, x0 = initial_condition, method = method, options = options,
                       constraints = quad_constr)
+    # print(solver)
     if solver.success:
 
         return solver.x.reshape(n_vars, 1)
