@@ -41,13 +41,7 @@ class Problem(object):
             self.bound = bound
             return self
         elif self.name == PROBLEM_CLASS['distributedSparseQCQP']:
-            mat = preprocessing.normalize(randn(self.nVars, self.nVars), norm = 'l2')
-            mat = 0.5 * (mat.T + mat)
-            diag_mat = (1 + rand()) * eye(self.nVars)
-            obj_hess = mat.T @ mat + diag_mat
 
-            obj_vec = rand(self.nVars, 1)
-            problem_data = {'obj_hess': obj_hess, 'obj_vec': obj_vec, 'obj_const': randn()}
             self.problem_instance = QuadConsProb(problem_data = problem_data)
             self.bound = bound
             return self
