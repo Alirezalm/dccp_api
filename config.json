@@ -1,1 +1,1 @@
-{"name": "dsqcqp", "nVars": 10, "nZeros": 5, "nNodes": 4, "compareTo": "shot", "soc": false, "sfp": false}
+{"name": "dsqcqp", "nVars": 10, "nZeros": 5, "nNodes": "2", "compareTo": "shot", "soc": false, "sfp": false}

@@ -28,7 +28,7 @@ def gen_qcqp(nvars, num_quad_consts):
             problem_data['obj']['hessian_mat'] = hess
             problem_data['obj']['grad_vec'] = grad
         else:
-            hess = eye(nvars)  # just for test
+            # hess = eye(nvars)  # just for test
             constr = {
                 'hessian_mat': hess,
                 'grad_vec': grad,
