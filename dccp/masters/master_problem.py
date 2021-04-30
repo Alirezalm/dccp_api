@@ -42,7 +42,7 @@ def solve_master(problem_instance, cut_manager):
 
     total_cuts = len(cut_manager.cut_storage) + len(cut_manager.const_cut_storage)
     print(f'Total Optimality Cuts: {total_cuts}\n'
-          f'Objective cuts: {len(cut_manager.cut_storage)}'
+          f'Objective cuts: {len(cut_manager.cut_storage)}\n'
           f'Constraints Cuts: { len(cut_manager.const_cut_storage)}')
 
     for i in range(n):
