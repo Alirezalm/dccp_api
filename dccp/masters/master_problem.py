@@ -22,6 +22,7 @@ def solve_master(problem_instance, cut_manager):
 
     # introducing linear cuts
     i = 0
+
     for cut in cut_manager.cut_storage:
 
         if i == N - 1:
@@ -34,10 +35,15 @@ def solve_master(problem_instance, cut_manager):
                     x @ x - 2 * cut['x'].T @ x + cut['x'].T @ cut['x']), name = f"cut['cut_id']")
         else:
             model.addConstr(alpha[i] >= cut['fx'] + cut['gx'].T @ x - cut['gx'].T @ cut['x'], name = f"cut['cut_id']")
+    if problem_instance.problem_instance.constr is not None:
+        for const_cut in cut_manager.const_cut_storage:
+            model.addConstr(0 >= const_cut['gx'] + const_cut['ggx'].T @ x - const_cut['ggx'].T @ const_cut['x'],
+                            name = 'gcut')
 
-    for const_cut in cut_manager.const_cut_storage:
-        model.addConstr(0 >= const_cut['gx'] + const_cut['ggx'].T @ x - const_cut['ggx'].T @ const_cut['x'],
-                        name = 'gcut')
+    total_cuts = len(cut_manager.cut_storage) + len(cut_manager.const_cut_storage)
+    print(f'Total Optimality Cuts: {total_cuts}\n'
+          f'Objective cuts: {len(cut_manager.cut_storage)}'
+          f'Constraints Cuts: { len(cut_manager.const_cut_storage)}')
 
     for i in range(n):
         model.addConstr(x[i] <= M * delta[i], name = f'b1{i}')

@@ -14,7 +14,7 @@ from dccp.rhadmm.rhadmm import rhadmm
 def dipoa(problem_instance, comm, mpi_class):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    max_iter = 300
+    max_iter = 10
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
     if problem_instance.sfp:
@@ -35,6 +35,9 @@ def dipoa(problem_instance, comm, mpi_class):
     x = zeros((n, 1))
     min_eig = 0
     problem_instance.sfp = False
+
+    if rank == 0:
+        print("DIPOA STARTS...\n")
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
@@ -64,10 +67,10 @@ def dipoa(problem_instance, comm, mpi_class):
                 else:
                     cut_manager.store_cut(k, node, rcv_x[node, :].reshape(n, 1), rcv_fx[node],
                                           rcv_gx[node, :].reshape(n, 1))
-
-            gx = problem_instance.problem_instance.compute_const_at(0, x)
-            ggx = problem_instance.problem_instance.compute_const_grad_at(0, x)
-            cut_manager.store_const_cut(x, gx, ggx)
+            if problem_instance.problem_instance.constr is not None:
+                gx = problem_instance.problem_instance.compute_const_at(0, x)
+                ggx = problem_instance.problem_instance.compute_const_grad_at(0, x)
+                cut_manager.store_const_cut(x, gx, ggx)
 
             lower_bound, binvar = solve_master(problem_instance, cut_manager)
             data_memory['ub'].append(upper_bound)
@@ -79,7 +82,8 @@ def dipoa(problem_instance, comm, mpi_class):
             print(f"k: {k} lb: {lower_bound}, ub:{upper_bound} gap: {rel_gap}")
         if rel_gap <= eps:
             break
-
+    if rank == 0:
+        print("CONVERGED. STORING THE DATA AND PACKING SOLUTION\n")
     data_memory['x'] = [item[0] for item in x]
     data_memory['obj'] = lower_bound
     data_memory['gap'] = (upper_bound - lower_bound) / abs(upper_bound + 1e-8)
