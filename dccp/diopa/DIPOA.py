@@ -65,6 +65,10 @@ def dipoa(problem_instance, comm, mpi_class):
                     cut_manager.store_cut(k, node, rcv_x[node, :].reshape(n, 1), rcv_fx[node],
                                           rcv_gx[node, :].reshape(n, 1))
 
+            gx = problem_instance.problem_instance.compute_const_at(0, x)
+            ggx = problem_instance.problem_instance.compute_const_grad_at(0, x)
+            cut_manager.store_const_cut(x, gx, ggx)
+
             lower_bound, binvar = solve_master(problem_instance, cut_manager)
             data_memory['ub'].append(upper_bound)
             data_memory['lb'].append(lower_bound)

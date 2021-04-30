@@ -19,7 +19,7 @@ def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
                 0,
                 jac = lambda x: (2 * constr['hessian_mat'] @ x.reshape(n_vars, 1) + constr['grad_vec']).reshape(
                     n_vars, ),
-                hess = lambda x, y: constr['hessian_mat']
+                hess = lambda x, y: 2 * constr['hessian_mat']
             ))
         options = {
             'disp': False

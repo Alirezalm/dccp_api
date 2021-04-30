@@ -31,9 +31,13 @@ def solve_master(problem_instance, cut_manager):
 
         if problem_instance.soc:
             model.addConstr(alpha[i] >= cut['fx'] + cut['gx'].T @ x - cut['gx'].T @ cut['x'] + cut['eig'] / 2 * (
-                        x @ x - 2 * cut['x'].T @ x + cut['x'].T @ cut['x']), name = f"cut['cut_id']")
+                    x @ x - 2 * cut['x'].T @ x + cut['x'].T @ cut['x']), name = f"cut['cut_id']")
         else:
             model.addConstr(alpha[i] >= cut['fx'] + cut['gx'].T @ x - cut['gx'].T @ cut['x'], name = f"cut['cut_id']")
+
+    for const_cut in cut_manager.const_cut_storage:
+        model.addConstr(0 >= const_cut['gx'] + const_cut['ggx'].T @ x - const_cut['ggx'].T @ const_cut['x'],
+                        name = 'gcut')
 
     for i in range(n):
         model.addConstr(x[i] <= M * delta[i], name = f'b1{i}')

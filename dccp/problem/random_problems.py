@@ -18,7 +18,10 @@ def gen_qcqp(nvars, num_quad_consts):
     }
 
     for i in range(num_quad_consts + 1):
-        # seed(0)
+        if i == 0:
+            seed(101)
+        else:
+            seed(0)
         _hess = preprocessing.normalize(randn(nvars, nvars), norm = 'l2')
         _hess = 0.5 * (_hess.T + _hess)
         diag_mat = (1 + rand()) * eye(nvars)
