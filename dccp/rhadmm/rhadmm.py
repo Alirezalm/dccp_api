@@ -33,11 +33,11 @@ def rhadmm(problem, bin_var, comm, mpi_class):
     eps = 1e-6
     sum_reduce = zeros((n, 1))  # size must match the reduce op -- used for MPI reduction
     rank = comm.Get_rank()
+    constr = problem.problem_instance.constr
     for k in range(max_iter):
         obj_func_inner = create_prime_obj(problem.problem_instance.compute_obj_at, z, y, rho)
         grad_func_inner = create_prime_grad(problem.problem_instance.compute_grad_at, z, y, rho)
-        x = update_primary_vars(obj_func_inner, grad_func_inner, n, problem.sfp, problem.nZeros,
-                                problem.bound, x)  # compute x update locally by each node
+        x = update_primary_vars(obj_func_inner, grad_func_inner, n, constr = constr)  # compute x update locally by each node
 
         sum_local = x + 1 / rho * y
         # reduction

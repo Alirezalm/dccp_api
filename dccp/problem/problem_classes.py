@@ -2,12 +2,12 @@ from numpy import exp, log, diagflat
 from numpy.random import rand, randn
 
 
-
 class LogRegProb(object):
 
     def __init__(self, local_dataset, local_response):
         self.local_dataset = local_dataset
         self.local_response = local_response
+        self.constr = None
 
     def compute_obj_at(self, x):
         n = x.shape[0]
@@ -39,9 +39,10 @@ class LogRegProb(object):
 
 class QuadConsProb(object):
     def __init__(self, problem_data):
-        self.obj_hess = problem_data['obj_hess']
-        self.obj_vec = problem_data['obj_vec']
-        self.obj_const = problem_data['obj_const']
+        self.obj_hess = problem_data['obj']['hessian_mat']
+        self.obj_vec = problem_data['obj']['grad_vec']
+        self.obj_const = problem_data['obj']['const']
+        self.constr = problem_data['constr']
 
     def compute_obj_at(self, x):
         return 0.5 * x.T @ self.obj_hess @ x + self.obj_vec.T @ x + self.obj_const

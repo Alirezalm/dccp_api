@@ -7,6 +7,7 @@ from sklearn import preprocessing
 from numpy.random import seed
 from dccp.diopa.DIPOA import dipoa
 from dccp.problem.problem_classes import LogRegProb, QuadConsProb
+from dccp.problem.random_problems import gen_qcqp
 from dccp.rhadmm.rhadmm import rhadmm
 
 PROBLEM_CLASS = {
@@ -41,6 +42,8 @@ class Problem(object):
             self.bound = bound
             return self
         elif self.name == PROBLEM_CLASS['distributedSparseQCQP']:
+
+            problem_data = gen_qcqp(nvars = self.nVars, num_quad_consts = 1)
 
             self.problem_instance = QuadConsProb(problem_data = problem_data)
             self.bound = bound

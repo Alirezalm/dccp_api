@@ -11,12 +11,10 @@ def gen_qcqp(nvars, num_quad_consts):
             'const': randn()
         },
 
-        'constr': {
-            'hessian_mat': [],
-            'grad_vec': [],
-            'const': []
+        'constr': [
 
-        }
+        ]
+
     }
 
     for i in range(num_quad_consts + 1):
@@ -29,7 +27,11 @@ def gen_qcqp(nvars, num_quad_consts):
             problem_data['obj']['hessian_mat'] = hess
             problem_data['obj']['grad_vec'] = grad
         else:
-            problem_data['constr']['hessian_mat'].append(hess)
-            problem_data['constr']['grad_vec'].append(grad)
-            problem_data['constr']['const'].append(randn())
+
+            constr = {
+                'hessian_mat': hess,
+                'grad_vec': grad,
+                'const': randn()
+            }
+            problem_data['constr'].append(constr)
     return problem_data
