@@ -35,14 +35,23 @@ def dipoa(problem_instance, comm, mpi_class):
     x = zeros((n, 1))
     min_eig = 0
     problem_instance.sfp = False
+    min_const_eig = 0
+
+    if (rank == 0) & problem_instance.soc & (problem_instance.problem_instance.constr is not None):
+        print('COMPUTING EIGENVALUES ...')
+        min_const_eig = min(eig(problem_instance.problem_instance.compute_const_hess_at(index = 0))[0])
+
+    if problem_instance.name == 'dsqcqp':
+        min_eig = min(eig(problem_instance.problem_instance.compute_hess_at())[0])
 
     if rank == 0:
         print("DIPOA STARTS...\n")
     for k in range(max_iter):
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
-        # print(norm(x))
-        if problem_instance.soc:
+
+        if problem_instance.soc & (problem_instance.name == 'dslr'):
+            print('COMPUTING EIGENVALUES ...')
             min_eig = min(eig(problem_instance.problem_instance.compute_hess_at(x))[0])
 
         ub = comm.reduce(fx, op = mpi_class.SUM, root = 0)
@@ -70,7 +79,10 @@ def dipoa(problem_instance, comm, mpi_class):
             if problem_instance.problem_instance.constr is not None:
                 gx = problem_instance.problem_instance.compute_const_at(0, x)
                 ggx = problem_instance.problem_instance.compute_const_grad_at(0, x)
-                cut_manager.store_const_cut(x, gx, ggx)
+                if problem_instance.soc:
+                    cut_manager.store_const_cut(x, gx, ggx, min_const_eig)
+                else:
+                    cut_manager.store_const_cut(x, gx, ggx)
 
             lower_bound, binvar = solve_master(problem_instance, cut_manager)
             data_memory['ub'].append(upper_bound)

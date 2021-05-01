@@ -50,7 +50,7 @@ class QuadConsProb(object):
     def compute_grad_at(self, x):
         return self.obj_hess @ x + self.obj_vec
 
-    def compute_hess_at(self, x):
+    def compute_hess_at(self, x = None):
         return self.obj_hess
 
     def compute_const_at(self, index, x):
