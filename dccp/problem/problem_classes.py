@@ -58,7 +58,7 @@ class QuadConsProb(object):
             'const'])[0][0]
 
     def compute_const_grad_at(self, index, x):
-        return 2 * self.constr[index]['hessian_mat'] @ x + self.constr[index]['grad_vec'].T @ x
+        return 2 * self.constr[index]['hessian_mat'] @ x + self.constr[index]['grad_vec']
 
     def compute_const_hess_at(self, index, x = None):
         return 2 * self.constr[index]['hessian_mat']

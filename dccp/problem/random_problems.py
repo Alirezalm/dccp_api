@@ -4,6 +4,7 @@ from sklearn import preprocessing
 
 
 def gen_qcqp(nvars, num_quad_consts):
+    # seed(0)
     problem_data = {
         'obj': {
             'hessian_mat': None,
