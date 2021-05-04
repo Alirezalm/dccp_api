@@ -14,7 +14,7 @@ from dccp.rhadmm.rhadmm import rhadmm
 def dipoa(problem_instance, comm, mpi_class):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    max_iter = 10
+    max_iter = 200
     n = problem_instance.nVars
     binvar = zeros((problem_instance.nVars, 1))  # initial binary
     if problem_instance.sfp:
@@ -91,7 +91,7 @@ def dipoa(problem_instance, comm, mpi_class):
 
         rel_gap = comm.bcast((upper_bound - lower_bound) / abs(upper_bound + 1e-8), root = 0)
         if rank == 0:
-            print(f"k: {k} lb: {lower_bound}, ub:{upper_bound} gap: {rel_gap}")
+            print(f"k: {k} lb: {lower_bound:8.4f}, ub:{upper_bound:8.4f} gap: {rel_gap * 100:8.3f} %")
         if rel_gap <= eps:
             break
     if rank == 0:
