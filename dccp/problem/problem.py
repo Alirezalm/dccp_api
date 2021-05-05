@@ -1,14 +1,13 @@
 from time import time
 
-from numpy import zeros, eye
-from numpy.linalg import eig
-from numpy.random import randn, rand
+
+from numpy.random import randn
 from sklearn import preprocessing
-from numpy.random import seed
+
 from dccp.diopa.DIPOA import dipoa
 from dccp.problem.problem_classes import LogRegProb, QuadConsProb
 from dccp.problem.random_problems import gen_qcqp
-from dccp.rhadmm.rhadmm import rhadmm
+
 
 PROBLEM_CLASS = {
     'distributedSparseLogisticRegression': 'dslr',
@@ -43,7 +42,7 @@ class Problem(object):
             return self
         elif self.name == PROBLEM_CLASS['distributedSparseQCQP']:
 
-            problem_data = gen_qcqp(nvars = self.nVars, num_quad_consts = 0)
+            problem_data = gen_qcqp(nvars = self.nVars, num_quad_consts = 1)
 
             self.problem_instance = QuadConsProb(problem_data = problem_data)
             self.bound = bound
@@ -57,3 +56,5 @@ class Problem(object):
         elapsed_time = time() - start_time
         solution_data['elapsed_time'] = elapsed_time
         return solution_data
+
+

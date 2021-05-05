@@ -59,7 +59,7 @@ def solve_master(problem_instance, cut_manager):
 
     model.addConstr(delta.sum() <= kappa, name = 'd')
     model.setParam('OutputFlag', 0)
-    model.setParam('MIPGap', 1e-5)
+    model.setParam('MIPGap', 1e-4)
     model.optimize()
     # model.printStats()
-    return model.objval, delta.x.reshape(n, 1),
+    return model.objval, delta.x.reshape(n, 1), x.x.reshape(n, 1)

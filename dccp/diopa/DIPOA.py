@@ -84,7 +84,7 @@ def dipoa(problem_instance, comm, mpi_class):
                 else:
                     cut_manager.store_const_cut(x, gx, ggx)
 
-            lower_bound, binvar = solve_master(problem_instance, cut_manager)
+            lower_bound, binvar, x = solve_master(problem_instance, cut_manager)
             data_memory['ub'].append(upper_bound)
             data_memory['lb'].append(lower_bound)
             data_memory['iter'].append(k)

@@ -23,7 +23,7 @@ def create_prime_grad(main_grad, z, y, rho):
 
 
 def rhadmm(problem, bin_var, comm, mpi_class):
-    rho = 1
+    rho = 50
     max_iter = 10000
     n = problem.nVars
     y = zeros((n, 1))

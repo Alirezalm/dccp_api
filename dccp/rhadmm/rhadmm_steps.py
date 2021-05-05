@@ -6,7 +6,7 @@ from scipy.optimize import minimize, NonlinearConstraint, BFGS
 
 def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
     initial_condition = zeros((n_vars,))
-    method = 'TNC'
+    method = 'CG'
     quad_constr = []
     options = {}
     if constrs is not None:
@@ -38,4 +38,4 @@ def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
 
         return solver.x.reshape(n_vars, 1)
     else:
-        raise ValueError("Inner Solver inside RHADMM failed.")
+        raise ValueError(f"Inner Solver inside RHADMM failed. {method}")
