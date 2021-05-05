@@ -1,6 +1,8 @@
 """
 Main loop of the DIPOA Algorithm
 """
+from time import time
+
 from numpy import zeros
 from numpy.linalg import eig, norm
 from numpy.ma import ones
@@ -32,6 +34,7 @@ def dipoa(problem_instance, comm, mpi_class):
         'ub': [],
         'iter': []
     }
+    time_limit = 5
     x = zeros((n, 1))
     min_eig = 0
     problem_instance.sfp = False
@@ -46,12 +49,15 @@ def dipoa(problem_instance, comm, mpi_class):
 
     if rank == 0:
         print("DIPOA STARTS...\n")
+
+    start = time()
     for k in range(max_iter):
+        current_time = time() - start
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
                            mpi_class = mpi_class)  # solves primal problem
 
         if problem_instance.soc & (problem_instance.name == 'dslr'):
-            print('COMPUTING EIGENVALUES ...')
+            print(f'CPU {rank} COMPUTING EIGENVALUES ...')
             min_eig = min(eig(problem_instance.problem_instance.compute_hess_at(x))[0])
 
         ub = comm.reduce(fx, op = mpi_class.SUM, root = 0)
@@ -67,8 +73,12 @@ def dipoa(problem_instance, comm, mpi_class):
             rcv_eig = comm.gather(min_eig, root = 0)
         comm.Gather([x, mpi_class.DOUBLE], rcv_x, root = 0)
         comm.Gather([gx, mpi_class.DOUBLE], rcv_gx, root = 0)
-
+        # if current_time >= time_limit:
+        #     if rank == 0:
+        #         print(f"DOES NOT CONVERGED DUE TO TIME LIMIT {time_limit}. \n")
+        #     break
         if rank == 0:
+
             for node in range(size):
                 if problem_instance.soc:
                     cut_manager.store_cut(k, node, rcv_x[node, :].reshape(n, 1), rcv_fx[node],
@@ -91,11 +101,14 @@ def dipoa(problem_instance, comm, mpi_class):
 
         rel_gap = comm.bcast((upper_bound - lower_bound) / abs(upper_bound + 1e-8), root = 0)
         if rank == 0:
-            print(f"k: {k} lb: {lower_bound:8.4f}, ub:{upper_bound:8.4f} gap: {rel_gap * 100:8.3f} %")
+            print(
+                f"k: {k} lb: {lower_bound:8.4f}, ub:{upper_bound:8.4f} gap: {rel_gap * 100:8.3f} % "
+                f"elapsed: {current_time:4.3f}")
         if rel_gap <= eps:
+            if rank == 0:
+                print("CONVERGED. STORING THE DATA AND PACKING SOLUTION\n")
             break
-    if rank == 0:
-        print("CONVERGED. STORING THE DATA AND PACKING SOLUTION\n")
+
     data_memory['x'] = [item[0] for item in x]
     data_memory['obj'] = lower_bound
     data_memory['gap'] = (upper_bound - lower_bound) / abs(upper_bound + 1e-8)

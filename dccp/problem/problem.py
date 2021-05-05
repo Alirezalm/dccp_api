@@ -22,7 +22,6 @@ class Problem(object):
         if self.name == "dslr":
             self.nSamples = int(problem_data['nSamples'])
         self.nZeros = int(problem_data['nZeros'])
-        self.compareTo = problem_data['compareTo']
         self.nNodes = int(problem_data['nNodes'])
         self.sfp = bool(problem_data['sfp'])
         self.soc = bool(problem_data['soc'])
