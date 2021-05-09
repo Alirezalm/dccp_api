@@ -31,11 +31,12 @@ def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
         else:
             raise ValueError("INNER PROBLEM FAILED: PROBLEM INFEASIBLE")
 
-    solver = minimize(rhadmm_obj, jac = rhadmm_grad, x0 = initial_condition, method = method, options = options,
-                      constraints = quad_constr)
+        # x = interior_point
+    # solver = minimize(rhadmm_obj, jac = rhadmm_grad, x0 = initial_condition, method = method, options = options,
+    #                   constraints = quad_constr)
     # print(solver)
-    if solver.success:
-
-        return solver.x.reshape(n_vars, 1)
-    else:
-        raise ValueError(f"Inner Solver inside RHADMM failed. {method}")
+    # if solver.success:
+    #
+    #     return solver.x.reshape(n_vars, 1)
+    # else:
+    #     raise ValueError(f"Inner Solver inside RHADMM failed. {method}")
