@@ -41,6 +41,7 @@ class Problem(object):
             return self
         elif self.name == PROBLEM_CLASS['distributedSparseQCQP']:
 
+
             problem_data = gen_qcqp(nvars = self.nVars, num_quad_consts = 1)
 
             self.problem_instance = QuadConsProb(problem_data = problem_data)
