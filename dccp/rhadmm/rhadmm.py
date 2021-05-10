@@ -26,7 +26,7 @@ def create_prime_grad(main_grad, z, y, rho):
 
 def rhadmm(problem, bin_var, comm, mpi_class):
     rho = 1
-    max_iter = 200
+    max_iter = 80
     n = problem.nVars
     alpha = 1.5
     y = zeros((n, 1))
@@ -70,7 +70,7 @@ def rhadmm(problem, bin_var, comm, mpi_class):
 
         # if rank == 0:
         #     print(f" k:{k} t: {t} s: {s} rank: {rank}")
-        # rho = gen_penalty(t, s, rho)
+        rho = gen_penalty(t, s, rho)
         # print('rho: ', rho)
         if (t <= eps) & (s <= eps / 2):
 
