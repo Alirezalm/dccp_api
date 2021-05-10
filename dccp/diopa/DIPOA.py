@@ -4,8 +4,8 @@ Main loop of the DIPOA Algorithm
 from time import time
 
 from numpy import zeros
-from numpy.linalg import eig, norm
-from numpy.ma import ones
+from numpy.linalg import eig
+
 
 from dccp.diopa.cut_store_gen import CutStoreGen
 from dccp.diopa.heuristics import sfp
@@ -34,7 +34,7 @@ def dipoa(problem_instance, comm, mpi_class):
         'ub': [],
         'iter': []
     }
-    time_limit = 5
+    # time_limit = 5
     x = zeros((n, 1))
     min_eig = 0
     problem_instance.sfp = False
