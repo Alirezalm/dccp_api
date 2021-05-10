@@ -28,11 +28,12 @@ def rhadmm(problem, bin_var, comm, mpi_class):
     rho = 1
     max_iter = 200
     n = problem.nVars
+    alpha = 1.5
     y = zeros((n, 1))
     z = zeros((n, 1))
     x = zeros((n, 1))
     z_old = zeros((n, 1))
-    eps = 1e-4
+    eps = 1e-3
     sum_reduce = zeros((n, 1))  # size must match the reduce op -- used for MPI reduction
     rank = comm.Get_rank()
     constr = problem.problem_instance.constr
@@ -45,8 +46,9 @@ def rhadmm(problem, bin_var, comm, mpi_class):
             grad_func_inner = create_prime_grad(problem.problem_instance.compute_grad_at, z, y, rho)
             x = update_primary_vars(obj_func_inner, grad_func_inner, n,
                                     constrs = constr)  # compute x update locally by each node
-
-        sum_local = x + 1 / rho * y
+        x_hat = alpha * x + (1 - alpha) * z_old
+        # sum_local = x + 1 / rho * y
+        sum_local = x_hat + 1 / rho * y
         # reduction
         comm.Reduce([sum_local, mpi_class.DOUBLE], [sum_reduce, mpi_class.DOUBLE], op = mpi_class.SUM, root = 0)
         if rank == 0:
@@ -59,8 +61,8 @@ def rhadmm(problem, bin_var, comm, mpi_class):
         comm.Bcast(z, root = 0)  # broadcasting the z step .. all nodes have updates z
 
         # print(f" iter: {k} z: {norm(z)} z_old: {norm(z_old)} rank: {rank}")
-        y += rho * (x - z)  # y update
-
+        # y += rho * (x - z)  # y update
+        y += rho * (x_hat - z)  # y update relaxed
         r = norm(x - z, 2)
         s = rho ** 2 * problem.nNodes * norm(z_old - z)
         t = comm.reduce(r, op = mpi_class.SUM, root = 0)
@@ -73,8 +75,9 @@ def rhadmm(problem, bin_var, comm, mpi_class):
         if (t <= eps) & (s <= eps / 2):
 
             if rank == 0:
-                print(f"RHADMM ITERATION MAX: {k}")
+                print(f"RHADMM ITERATION MAX: {k} penalty: {rho}")
             return z, problem.problem_instance.compute_obj_at(z)[0][0], problem.problem_instance.compute_grad_at(z)
     if rank == 0:
-        print(f"RHADMM DID NOT CONVERGE: r: {r} s: {s}")
+        print(f"RHADMM DID NOT CONVERGE: r: {r} s: {s} penalty: {rho}")
+
     return z, problem.problem_instance.compute_obj_at(z)[0][0], problem.problem_instance.compute_grad_at(z)
