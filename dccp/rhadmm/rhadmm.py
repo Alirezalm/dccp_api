@@ -26,7 +26,7 @@ def create_prime_grad(main_grad, z, y, rho):
 
 def rhadmm(problem, bin_var, comm, mpi_class):
     rho = 1
-    max_iter = 1000
+    max_iter = 200
     n = problem.nVars
     y = zeros((n, 1))
     z = zeros((n, 1))
@@ -37,12 +37,12 @@ def rhadmm(problem, bin_var, comm, mpi_class):
     rank = comm.Get_rank()
     constr = problem.problem_instance.constr
     for k in range(max_iter):
-        obj_func_inner = create_prime_obj(problem.problem_instance.compute_obj_at, z, y, rho)
-        grad_func_inner = create_prime_grad(problem.problem_instance.compute_grad_at, z, y, rho)
 
         if constr is not None:
             x, objVal = gurobi_qcp(problem, y, z, rho)
         else:
+            obj_func_inner = create_prime_obj(problem.problem_instance.compute_obj_at, z, y, rho)
+            grad_func_inner = create_prime_grad(problem.problem_instance.compute_grad_at, z, y, rho)
             x = update_primary_vars(obj_func_inner, grad_func_inner, n,
                                     constrs = constr)  # compute x update locally by each node
 
