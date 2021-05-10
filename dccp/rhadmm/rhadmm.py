@@ -2,6 +2,7 @@ from numpy import zeros, minimum, maximum
 from scipy.linalg import norm
 
 from dccp.rhadmm.gurobi_qcp import gurobi_qcp
+from dccp.rhadmm.improvements import gen_penalty
 from dccp.rhadmm.rhadmm_steps import update_primary_vars
 
 
@@ -31,7 +32,7 @@ def rhadmm(problem, bin_var, comm, mpi_class):
     z = zeros((n, 1))
     x = zeros((n, 1))
     z_old = zeros((n, 1))
-    eps = 1e-6
+    eps = 1e-4
     sum_reduce = zeros((n, 1))  # size must match the reduce op -- used for MPI reduction
     rank = comm.Get_rank()
     constr = problem.problem_instance.constr
@@ -67,7 +68,8 @@ def rhadmm(problem, bin_var, comm, mpi_class):
 
         # if rank == 0:
         #     print(f" k:{k} t: {t} s: {s} rank: {rank}")
-
+        # rho = gen_penalty(t, s, rho)
+        # print('rho: ', rho)
         if (t <= eps) & (s <= eps / 2):
 
             if rank == 0:
