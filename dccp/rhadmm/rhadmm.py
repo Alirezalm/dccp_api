@@ -31,12 +31,13 @@ def rhadmm(problem, bin_var, comm, mpi_class):
     alpha = 1.5
     y = zeros((n, 1))
     z = zeros((n, 1))
-    x = zeros((n, 1))
     z_old = zeros((n, 1))
     eps = 1e-3
     sum_reduce = zeros((n, 1))  # size must match the reduce op -- used for MPI reduction
     rank = comm.Get_rank()
     constr = problem.problem_instance.constr
+    r = None
+    s = None
     for k in range(max_iter):
 
         if constr is not None:

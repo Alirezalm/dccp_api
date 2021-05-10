@@ -8,8 +8,9 @@ def gurobi_qcp(problem, y, z, rho):
     n = problem.nVars
     x = model.addMVar(shape = n, lb = -GRB.INFINITY)
 
-    obj = x @ (problem.problem_instance.obj_hess * 0.5) @ x + problem.problem_instance.obj_vec.T @ x + \
-          problem.problem_instance.obj_const + y.T @ x - y.T @ z + (rho / 2) * (x @ x - 2 * z.T @ x + z.T @ z)
+    obj = x @ (problem.problem_instance.obj_hess * 0.5) @ x + \
+          problem.problem_instance.obj_vec.T @ x + problem.problem_instance.obj_const + \
+          y.T @ x - y.T @ z + (rho / 2) * (x @ x - 2 * z.T @ x + z.T @ z)
 
     model.setObjective(obj, GRB.MINIMIZE)
     const = x @ problem.problem_instance.constr[0]['hessian_mat'] @ x + problem.problem_instance.constr[0][

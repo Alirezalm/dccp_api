@@ -1,10 +1,8 @@
 import json
-import sys
-
 from flask import json
 from mpi4py import MPI
-
 from dccp.problem.problem import Problem
+
 
 with open('config.json') as jsonfile:
     my_data = json.load(jsonfile)
