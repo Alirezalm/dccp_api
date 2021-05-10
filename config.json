@@ -1,1 +1,1 @@
-{"name": "dsqcqp", "nVars": "2", "nZeros": "1", "nNodes": "1", "soc": true, "sfp": false, "solvers": ["cplex"]}
+{"name": "dsqcqp", "nVars": 10, "nZeros": 5, "nNodes": 4, "soc": false, "sfp": true, "solvers": []}

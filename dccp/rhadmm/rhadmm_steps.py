@@ -3,6 +3,8 @@ from numpy.linalg import norm
 from numpy.random import randn
 from scipy.optimize import minimize, NonlinearConstraint, BFGS
 
+from dccp.rhadmm.gurobi_qcp import gurobi_qcp
+
 
 def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
     initial_condition = zeros((n_vars,))
@@ -31,6 +33,7 @@ def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
         else:
             raise ValueError("INNER PROBLEM FAILED: PROBLEM INFEASIBLE")
 
+        x = gurobi_qcp(rhadmm_obj, quad_constr[0].fun, init = initial_condition)
     solver = minimize(rhadmm_obj, jac = rhadmm_grad, x0 = initial_condition, method = method, options = options,
                       constraints = quad_constr)
     # print(solver)
