@@ -26,13 +26,13 @@ def create_prime_grad(main_grad, z, y, rho):
 
 def rhadmm(problem, bin_var, comm, mpi_class):
     rho = 1
-    max_iter = 80
+    max_iter = 200
     n = problem.nVars
     alpha = 1.5
     y = zeros((n, 1))
     z = zeros((n, 1))
     z_old = zeros((n, 1))
-    eps = 1e-3
+    eps = 5e-3
     sum_reduce = zeros((n, 1))  # size must match the reduce op -- used for MPI reduction
     rank = comm.Get_rank()
     constr = problem.problem_instance.constr

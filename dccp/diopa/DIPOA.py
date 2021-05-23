@@ -27,7 +27,7 @@ def dipoa(problem_instance, comm, mpi_class):
     rcv_eig = None
     upper_bound = 1e8
     lower_bound = -upper_bound
-    eps = 0.05  # 5%
+    eps = 0.009  # 5%
     data_memory = {
         'x': None,
         'lb': [],

@@ -13,7 +13,7 @@ def run(data):
 
     rank = comm.Get_rank()
 
-    problem = Problem(problem_data = data).create_random_problem_instance(5)
+    problem = Problem(problem_data = data).create_random_problem_instance(0.16)
     solution_data = problem.solve(comm, MPI)
 
     if rank == 0:

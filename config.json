@@ -1,1 +1,1 @@
-{"name": "dsqcqp", "nVars": 10, "nZeros": 5, "nNodes": 4, "soc": false, "sfp": true, "solvers": []}
+{"name": "dslr", "nVars": "20", "nSamples": "14000", "nZeros": 5, "nNodes": "1", "soc": false, "sfp": false, "solvers": ["shot"]}

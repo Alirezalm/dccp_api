@@ -8,7 +8,7 @@ from dccp.rhadmm.gurobi_qcp import gurobi_qcp
 
 def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
     initial_condition = zeros((n_vars,))
-    method = 'CG'
+    method = 'cg'
     quad_constr = []
     options = {}
     if constrs is not None:
@@ -36,9 +36,9 @@ def update_primary_vars(rhadmm_obj, rhadmm_grad, n_vars, constrs = None):
         x = gurobi_qcp(rhadmm_obj, quad_constr[0].fun, init = initial_condition)
     solver = minimize(rhadmm_obj, jac = rhadmm_grad, x0 = initial_condition, method = method, options = options,
                       constraints = quad_constr)
-    # print(solver)
-    if solver.success:
+   # print(solver)
+    #if solver.success:
 
-        return solver.x.reshape(n_vars, 1)
-    else:
-        raise ValueError(f"Inner Solver inside RHADMM failed. {method}")
+    return solver.x.reshape(n_vars, 1)
+   # else:
+        #raise ValueError(f"Inner Solver inside RHADMM failed. {method}")
