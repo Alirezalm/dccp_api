@@ -1,0 +1,2 @@
+class NotEnoughInfo(Exception):
+    pass
