@@ -55,7 +55,7 @@ def rhadmm(problem, bin_var, comm, mpi_class):
         if rank == 0:
             z_old = z
             z = 1 / problem.nNodes * sum_reduce
-            # if not problem.sfp:
+            # if not API.sfp:
             z = minimum(problem.bound * bin_var, maximum(-problem.bound * bin_var, z))
 
         comm.Bcast(z_old, root = 0)

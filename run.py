@@ -1,6 +1,6 @@
 from mpi4py import MPI
 
-from dccp.problem.problem import Problem
+from dccp.API.problem import Problem
 
 
 def run(data):

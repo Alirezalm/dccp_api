@@ -54,7 +54,7 @@ def dipoa(problem_instance, comm, mpi_class):
     for k in range(max_iter):
         current_time = time() - start
         x, fx, gx = rhadmm(problem_instance, bin_var = binvar, comm = comm,
-                           mpi_class = mpi_class)  # solves primal problem
+                           mpi_class = mpi_class)  # solves primal API
 
         if problem_instance.soc & (problem_instance.name == 'dslr'):
             print(f'CPU {rank} COMPUTING EIGENVALUES ...')

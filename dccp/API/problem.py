@@ -1,12 +1,9 @@
 from time import time
-
-
 from numpy.random import randn
 from sklearn import preprocessing
-
 from dccp.diopa.DIPOA import dipoa
-from dccp.problem.problem_classes import LogRegProb, QuadConsProb
-from dccp.problem.random_problems import gen_qcqp
+from dccp.API.problem_classes import LogRegProb, QuadConsProb
+from dccp.API.random_problems import gen_qcqp
 
 
 PROBLEM_CLASS = {
