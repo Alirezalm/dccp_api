@@ -1,2 +1,2 @@
-# dccp_api
-Main service for the cardopt application
+# DCCP CLI Branch
+This branch consists of cli version of dccp solver. 
