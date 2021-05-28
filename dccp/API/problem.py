@@ -9,10 +9,26 @@ NUM_FUNC = 3
 
 class CardModel(object):
     def __init__(self, obj_list: list, constr_list: list = None):
+        """
+        DOCUMENTATION IS IMPORTANT HERE
+        """
         self.obj_list = obj_list
         self.constr_list = constr_list
         self.validated = False
         self._validation()
+
+    def _preprocessing(self):
+
+        obj_data = {
+            'fx': None,
+            'gfx': None,
+            'hfx': None
+        }
+
+        for index, key in enumerate(obj_data):
+            obj_data[key] = self.obj_list[index]
+
+        # TODO: Data Preprocessing for constr_data
 
     def _validation(self):
         if len(self.obj_list) <= NUM_FUNC:
